@@ -10,63 +10,28 @@
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
-    }
-  ],
-  "security": [
+      "url": "https://dev-api.thesales.io/v1",
+      "description": "Development Server"
+    },
     {
-      "bearerAuth": []
+      "url": "https://us-api.thesales.io/v1",
+      "description": "US Server"
+    },
+    {
+      "url": "https://api.thesales.io/v1",
+      "description": "EU Server"
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
+    "/public/add_lead": {
       "post": {
-        "description": "Creates a new plant in the store",
+        "description": "Adds lead to any campaign",
         "requestBody": {
-          "description": "Plant to add to the store",
+          "description": "Leads to add",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/Leads"
               }
             }
           },
@@ -74,54 +39,215 @@
         },
         "responses": {
           "200": {
-            "description": "plant response",
+            "description": "Leads response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/CreatedLeads"
                 }
               }
             }
           },
-          "400": {
-            "description": "unexpected error",
+          "401": {
+            "description": "Unauthorized Access",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/UnauthError"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Unauthorized Access Example",
+                    "value": {
+                      "message": "Unauthorized Access"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessible Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessError"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Required field missing",
+                    "value": {
+                      "message": "<required_field> required."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
                 }
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
+    "/public/auth/tokens": {
+      "post": {
+        "description": "Get Tokens using API Key",
+        "requestBody": {
+          "description": "Retrieve acess and refresh tokens",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Tokens"
+              }
             }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
           },
-          "400": {
-            "description": "unexpected error",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Token response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/FetchedTokens"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthError"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Bad Request Example",
+                    "value": {
+                      "message": "Bad Request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessible Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessError"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Required field missing",
+                    "value": {
+                      "message": "<required_field> required."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/public/auth/token/refresh": {
+      "post": {
+        "description": "Get Access Token from Refresh Token",
+        "requestBody": {
+          "description": "Retrieve acess and refresh tokens",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshToken"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "accessToken response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FetchedAccessTokens"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthError"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Bad Request Example",
+                    "value": {
+                      "message": "Bad Request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessible Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessError"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Required field missing",
+                    "value": {
+                      "message": "<required_field> required."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerError"
                 }
               }
             }
@@ -132,53 +258,479 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
+      "Tokens": {
         "required": [
-          "name"
+          "accessTokenValidity"
         ],
         "type": "object",
         "properties": {
-          "name": {
-            "description": "The name of the plant",
+          "accessTokenValidity": {
+            "description": "Validity of the accessToken in days (eg- 5days, 10days etc)",
+            "type": "string",
+            "enum": [
+              "1day",
+              "2days",
+              "3days",
+              "4days",
+              "5days",
+              "6days",
+              "7days"
+            ]
+          }
+        }
+      },
+      "FetchedTokens": {
+        "type": "object",
+        "properties": {
+          "msg": {
+            "description": "Success Message",
             "type": "string"
           },
-          "tag": {
-            "description": "Tag to specify the type",
+          "data": {
+            "required": [
+              "accessToken",
+              "refreshToken"
+            ],
+            "description": "Tokens retrieved from API Key",
+            "type": "object",
+            "properties": {
+              "accessToken": {
+                "description": "Access Token",
+                "type": "string"
+              },
+              "refreshToken": {
+                "description": "Refresh Token",
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "RefreshToken": {
+        "required": [
+          "accessTokenValidity",
+          "refreshToken"
+        ],
+        "type": "object",
+        "properties": {
+          "accessTokenValidity": {
+            "description": "Validity of the accessToken in days (eg- 5days, 10days etc)",
+            "type": "string",
+            "enum": [
+              "1day",
+              "2days",
+              "3days",
+              "4days",
+              "5days",
+              "6days",
+              "7days"
+            ]
+          },
+          "refreshToken": {
+            "description": "Refresh Token retrieved from API key",
             "type": "string"
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
+      "FetchedAccessTokens": {
+        "type": "object",
+        "properties": {
+          "msg": {
+            "description": "Success Message",
+            "type": "string"
           },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
+          "data": {
+            "description": "Access Token",
+            "type": "string"
+          }
+        }
+      },
+      "Leads": {
+        "required": [
+          "campaign_id",
+          "leads"
+        ],
+        "type": "object",
+        "properties": {
+          "campaign_id": {
+            "description": "The id of the campaign you want to add lead to",
+            "type": "number"
+          },
+          "leads": {
+            "description": "Array of objects of leads you want to add",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "first_name": {
+                  "description": "First name of the lead",
+                  "type": "string"
+                },
+                "last_name": {
+                  "description": "Last name of the lead",
+                  "type": "string"
+                },
+                "primary_phone": {
+                  "description": "Primary phone number of the lead with country code",
+                  "type": "string"
+                },
+                "alternative_phone_1": {
+                  "description": "Alternative Phone 1 of the lead with country code",
+                  "type": "string"
+                },
+                "alternative_phone_2": {
+                  "description": "Alternative Phone 2 of the lead with country code",
+                  "type": "string"
+                },
+                "alternative_phone_3": {
+                  "description": "Alternative Phone 3 of the lead with country code",
+                  "type": "string"
+                },
+                "whatsapp_phone": {
+                  "description": "WhatsApp Phone number of the lead with country code",
+                  "type": "string"
+                },
+                "primary_email": {
+                  "description": "Primary email of the lead ",
+                  "type": "string"
+                },
+                "alternative_email_1": {
+                  "description": "Alternative Email 1 of the lead ",
+                  "type": "string"
+                },
+                "alternative_email_2": {
+                  "description": "Alternative Email 2 of the lead ",
+                  "type": "string"
+                },
+                "alternative_email_3": {
+                  "description": "Alternative Email 3 of the lead ",
+                  "type": "string"
+                },
+                "linkedin_url": {
+                  "description": "Linkedin URL of the lead",
+                  "type": "string"
+                },
+                "job_position": {
+                  "description": "Job position of the lead",
+                  "type": "string"
+                },
+                "timezone": {
+                  "description": "timezone of the lead",
+                  "type": "string"
+                },
+                "langauge": {
+                  "description": "Language spoken of the lead",
+                  "type": "string"
+                },
+                "source": {
+                  "description": "Source of the lead",
+                  "type": "string"
+                },
+                "company_name": {
+                  "description": "Company Name",
+                  "type": "string"
+                },
+                "company_website_url": {
+                  "description": "Company Website URL",
+                  "type": "string"
+                },
+                "company_linkedin_url": {
+                  "description": "Company LinkedIn URL",
+                  "type": "string"
+                },
+                "company_industry": {
+                  "description": "Company Industry",
+                  "type": "string"
+                },
+                "company_employee_size": {
+                  "description": "Company Employee Size",
+                  "type": "string"
+                },
+                "company_hq_country": {
+                  "description": "Company HQ Country",
+                  "type": "string"
+                },
+                "company_address": {
+                  "description": "Company Address",
+                  "type": "string"
+                },
+                "company_phone_number": {
+                  "description": "Company Phone Number",
+                  "type": "string"
+                },
+                "company_email_id": {
+                  "description": "Company Email ID",
+                  "type": "string"
+                },
+                "interested": {
+                  "description": "Interested",
+                  "type": "boolean"
+                },
+                "tag": {
+                  "description": "Tag",
+                  "type": "string"
+                },
+                "demo_booked": {
+                  "description": "Demo booked",
+                  "type": "boolean"
+                },
+                "demo_booked_time": {
+                  "description": "Demo booked time",
+                  "type": "string"
+                },
+                "custom_data": {
+                  "description": "Custom data",
+                  "type": "object"
+                },
+                "SIRET": {
+                  "description": "SIRET",
+                  "type": "integer"
+                },
+                "SIREN": {
+                  "description": "SIREN",
+                  "type": "integer"
+                },
+                "document_url": {
+                  "description": "Document URL",
+                  "type": "string"
+                },
+                "plan_name": {
+                  "description": "Plan Name",
+                  "type": "string"
+                },
+                "address": {
+                  "description": "Address",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "first_name",
+                "primary_phone"
+              ]
+            }
+          }
+        }
+      },
+      "CreatedLeads": {
+        "type": "object",
+        "properties": {
+          "msg": {
+            "description": "Success Message",
+            "type": "string"
+          },
+          "data": {
+            "description": "Data of the added leads",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "description": "Lead status",
+                  "type": "string"
+                },
+                "is_in_running_campaign": {
+                  "description": "Flag indicating if the lead is in a running campaign",
+                  "type": "boolean"
+                },
+                "interested": {
+                  "description": "Flag indicating if the lead is interested",
+                  "type": "boolean"
+                },
+                "tag": {
+                  "description": "Lead tag",
+                  "type": "string"
+                },
+                "demo_booked": {
+                  "description": "Flag indicating if a demo is booked",
+                  "type": "boolean"
+                },
+                "is_lusha_enriched": {
+                  "description": "Flag indicating if the lead is enriched with Lusha data",
+                  "type": "boolean"
+                },
+                "document_url": {
+                  "description": "URL of the lead's document",
+                  "type": "string"
+                },
+                "plan_name": {
+                  "description": "Name of the plan",
+                  "type": "string"
+                },
+                "address": {
+                  "description": "Lead address",
+                  "type": "string"
+                },
+                "lead_id": {
+                  "description": "Lead ID",
+                  "type": "number"
+                },
+                "first_name": {
+                  "description": "First name of the lead",
+                  "type": "string"
+                },
+                "last_name": {
+                  "description": "Last name of the lead",
+                  "type": "string"
+                },
+                "primary_phone": {
+                  "description": "Primary phone number of the lead",
+                  "type": "string"
+                },
+                "alternative_phone_1": {
+                  "description": "Alternative Phone 1 of the lead with country code",
+                  "type": "string"
+                },
+                "alternative_phone_2": {
+                  "description": "Alternative Phone 2 of the lead with country code",
+                  "type": "string"
+                },
+                "alternative_phone_3": {
+                  "description": "Alternative Phone 3 of the lead with country code",
+                  "type": "string"
+                },
+                "whatsapp_phone": {
+                  "description": "WhatsApp Phone number of the lead with country code",
+                  "type": "string"
+                },
+                "primary_email": {
+                  "description": "Primary email of the lead ",
+                  "type": "string"
+                },
+                "alternative_email_1": {
+                  "description": "Alternative Email 1 of the lead ",
+                  "type": "string"
+                },
+                "alternative_email_2": {
+                  "description": "Alternative Email 2 of the lead ",
+                  "type": "string"
+                },
+                "alternative_email_3": {
+                  "description": "Alternative Email 3 of the lead ",
+                  "type": "string"
+                },
+                "linkedin_url": {
+                  "description": "Linkedin URL of the lead",
+                  "type": "string"
+                },
+                "job_position": {
+                  "description": "Job position of the lead",
+                  "type": "string"
+                },
+                "timezone": {
+                  "description": "timezone of the lead",
+                  "type": "string"
+                },
+                "langauge": {
+                  "description": "Language spoken of the lead",
+                  "type": "string"
+                },
+                "source": {
+                  "description": "Source of the lead",
+                  "type": "string"
+                },
+                "company_name": {
+                  "description": "Company Name",
+                  "type": "string"
+                },
+                "company_website_url": {
+                  "description": "Company Website URL",
+                  "type": "string"
+                },
+                "company_linkedin_url": {
+                  "description": "Company LinkedIn URL",
+                  "type": "string"
+                },
+                "company_industry": {
+                  "description": "Company Industry",
+                  "type": "string"
+                },
+                "company_employee_size": {
+                  "description": "Company Employee Size",
+                  "type": "string"
+                },
+                "company_hq_country": {
+                  "description": "Company HQ Country",
+                  "type": "string"
+                },
+                "company_address": {
+                  "description": "Company Address",
+                  "type": "string"
+                },
+                "company_phone_number": {
+                  "description": "Company Phone Number",
+                  "type": "string"
+                },
+                "company_email_id": {
+                  "description": "Company Email ID",
+                  "type": "string"
+                },
+                "demo_booked_time": {
+                  "description": "Demo booked time",
+                  "type": "string"
+                },
+                "custom_data": {
+                  "description": "Custom data",
+                  "type": "object"
+                },
+                "SIRET": {
+                  "description": "SIRET",
+                  "type": "integer"
+                },
+                "SIREN": {
+                  "description": "SIREN",
+                  "type": "integer"
+                },
+                "company_id": {
+                  "description": "ID of the company",
+                  "type": "string"
+                },
+                "owner_id": {
+                  "description": "ID of the owner",
+                  "type": "string"
+                },
+                "created_at": {
+                  "description": "Date and time when the lead was created",
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updated_at": {
+                  "description": "Date and time when the lead was last updated",
+                  "type": "string",
+                  "format": "date-time"
+                }
               }
             }
           }
-        ]
+        }
       },
-      "Error": {
+      "UnauthError": {
         "required": [
-          "error",
           "message"
         ],
         "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "UnprocessError": {
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ServerError": {
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "properties": {
           "message": {
             "type": "string"
           }
@@ -189,6 +741,12 @@
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer"
+      },
+      "apiKeyAuth": {
+        "description": "API key that can be found in your settings for AICALLS",
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
       }
     }
   }

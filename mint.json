@@ -75,11 +75,16 @@
       ]
     },
     {
-      "group": "Endpoint Examples",
+      "group": "Generate Tokens",
       "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
+        "api-reference/endpoint/accessToken",
+        "api-reference/endpoint/refreshToken"
+      ]
+    },
+    {
+      "group": "Leads To Campaign",
+      "pages": [
+        "api-reference/endpoint/create"
       ]
     }
   ],
