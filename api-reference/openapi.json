@@ -10,10 +10,6 @@
   },
   "servers": [
     {
-      "url": "https://dev-api.thesales.io/v1",
-      "description": "Development Server"
-    },
-    {
       "url": "https://us-api.thesales.io/v1",
       "description": "US Server"
     },
