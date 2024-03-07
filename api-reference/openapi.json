@@ -21,6 +21,18 @@
   "paths": {
     "/public/add_lead": {
       "post": {
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "The type of lead to add",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["custom"]
+            }
+          }
+        ],
         "description": "Adds lead to any campaign",
         "requestBody": {
           "description": "Leads to add",
@@ -255,9 +267,7 @@
   "components": {
     "schemas": {
       "Tokens": {
-        "required": [
-          "accessTokenValidity"
-        ],
+        "required": ["accessTokenValidity"],
         "type": "object",
         "properties": {
           "accessTokenValidity": {
@@ -283,10 +293,7 @@
             "type": "string"
           },
           "data": {
-            "required": [
-              "accessToken",
-              "refreshToken"
-            ],
+            "required": ["accessToken", "refreshToken"],
             "description": "Tokens retrieved from API Key",
             "type": "object",
             "properties": {
@@ -303,10 +310,7 @@
         }
       },
       "RefreshToken": {
-        "required": [
-          "accessTokenValidity",
-          "refreshToken"
-        ],
+        "required": ["accessTokenValidity", "refreshToken"],
         "type": "object",
         "properties": {
           "accessTokenValidity": {
@@ -342,10 +346,7 @@
         }
       },
       "Leads": {
-        "required": [
-          "campaign_id",
-          "leads"
-        ],
+        "required": ["campaign_id", "leads"],
         "type": "object",
         "properties": {
           "campaign_id": {
@@ -499,10 +500,7 @@
                   "type": "string"
                 }
               },
-              "required": [
-                "first_name",
-                "primary_phone"
-              ]
+              "required": ["first_name", "primary_phone"]
             }
           }
         }
@@ -700,9 +698,7 @@
         }
       },
       "UnauthError": {
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "type": "object",
         "properties": {
           "message": {
@@ -711,9 +707,7 @@
         }
       },
       "UnprocessError": {
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "type": "object",
         "properties": {
           "message": {
@@ -722,9 +716,7 @@
         }
       },
       "ServerError": {
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "type": "object",
         "properties": {
           "message": {
